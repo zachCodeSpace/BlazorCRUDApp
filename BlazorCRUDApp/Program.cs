@@ -1,4 +1,5 @@
 using BlazorCRUDApp.Data;
+using DataAccessLibrary;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 
@@ -8,6 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
+builder.Services.AddSingleton<IEmployeeService, EmployeeService>();
+builder.Services.AddTransient<ISQLDataAccess, SQLDataAccess>();
+builder.Services.AddTransient<IEmployeeData, EmployeeData>();
 
 var app = builder.Build();
 
