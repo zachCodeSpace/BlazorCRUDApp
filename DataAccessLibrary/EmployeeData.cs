@@ -30,5 +30,26 @@ namespace DataAccessLibrary
 
             return _db.SaveData(sql, employee);
         }
+
+        public Task DeleteEmployee(EmployeeModel employee)
+        {
+            string sql = "";
+
+            return _db.SaveData(sql, employee);
+        }
+
+        public Task UpdateEmployee(EmployeeModel employee)
+        {
+            string sql = "";
+
+            return _db.SaveData(sql, employee);
+        }
+
+        public Task<List<PaymentModel>> GetAllPayment()
+        {
+            string sql = "SELECT * FROM dbo.Payment";
+
+            return _db.LoadData<PaymentModel, dynamic>(sql, new { });
+        }
     }
 }

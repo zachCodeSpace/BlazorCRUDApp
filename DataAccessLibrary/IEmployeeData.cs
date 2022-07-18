@@ -8,5 +8,8 @@ namespace DataAccessLibrary
     {
         Task<List<EmployeeModel>> GetEmployees();
         Task InsertEmployee(EmployeeModel employee);
+        Task DeleteEmployee(EmployeeModel employee);
+        Task UpdateEmployee(EmployeeModel employee);
+        Task<List<PaymentModel>> GetAllPayment();
     }
 }
