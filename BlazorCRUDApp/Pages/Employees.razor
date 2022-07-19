@@ -14,7 +14,9 @@
 }
 else
 {
-    <table class="table table-striped">
+    <div class="container-lg">
+        <h3>Employee List</h3>
+        <table class="table table-striped">
         <thead>
             <tr>
                 <th>First Name</th>
@@ -25,21 +27,158 @@ else
         <tbody>
             @foreach(var employee in employees)
             {
+                if (employee.isEditing == true)
+                {
+                    <tr>
+                        <td><input class="input-group-text" @bind=employee.FirstName /></td>
+                        <td><input class="input-group-text" @bind=employee.LastName /></td>
+                        <td><input class="input-group-text" @bind=employee.EmailAddress /></td>
+                        <td><button class="btn-primary" @onclick="()=>SaveEmployee(employee)">✔</button></td>
+                        <td><button class="btn-group-sm" @onclick="()=>FlipEditing(employee)">❌</button></td>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td>@employee.FirstName</td>
+                        <td>@employee.LastName</td>
+                        <td>@employee.EmailAddress</td>
+                        <td><button class="btn-primary" @onclick="()=>FlipEditing(employee)">⚙</button></td>
+                        <td><button class="btn-group-sm" @onclick="()=>DeleteEmployee(employee)">🗑</button></td>
+                    </tr>
+                }
+            }
+            @if (isEdit)
+            {
                 <tr>
-                    <td>@employee.FirstName</td>
-                    <td>@employee.LastName</td>
-                    <td>@employee.EmailAddress</td>
+                    <td><input class="input-group-text" @bind=insertEmployee.FirstName/></td>
+                    <td><input class="input-group-text" @bind=insertEmployee.LastName/></td>
+                    <td><input class="input-group-text" @bind=insertEmployee.EmailAddress/></td>
+                    <td><button class="btn-primary" @onclick="()=> InsertEmployee(insertEmployee)">✔</button></td>
+                    <td><button class="btn-group-sm" @onclick="FlipEdit">❌</button></td>
                 </tr>
             }
+            else
+            {
+                    <tr>
+                        <td><button class="btn-secondary" @onclick="FlipEdit">➕</button></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+            }
+
+
         </tbody>
     </table>
+    </div>
+
+    <br />
+    <br />
+
+
+    <div class="container-md">
+        <h3>Recent Employee Activity</h3>
+        @if(activities is null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type of Activity</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(ActivityModel activity in activities)
+                    {
+                        if (activity.ActivityType == "Promotion")
+                        {
+                            <tr class="text-success">
+                                <td>@activity.Name</td>
+                                <td>@activity.ActivityType</td>
+                                <td>@activity.Action</td>
+                            </tr>
+                        }
+                        else if (activity.ActivityType == "Termination")
+                        {
+                            <tr class="text-danger">
+                                <td>@activity.Name</td>
+                                <td>@activity.ActivityType</td>
+                                <td>@activity.Action</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td>@activity.Name</td>
+                                <td>@activity.ActivityType</td>
+                                <td>@activity.Action</td>
+                            </tr>
+                        }
+
+                    }
+                </tbody>
+            </table>
+        }
+
+    </div>
 }
 
 @code {
     private List<EmployeeModel> ?employees;
+    private List<ActivityModel>? activities;
+    private EmployeeModel insertEmployee = new EmployeeModel();
+    private bool isEdit = false;
 
     protected override async Task OnInitializedAsync()
     {
         employees = await _db.GetEmployees();
+        activities = await _db.GetActivities();
+    }
+
+    void FlipEditing(EmployeeModel employee)
+    {
+        employee.isEditing = !employee.isEditing;
+    }
+
+    void SaveEmployee(EmployeeModel employee)
+    {
+        UpdateEmployee(employee);
+    }
+
+    void DeleteEmployee(EmployeeModel employee)
+    {
+        employee.Deleted = true;
+        UpdateEmployee(employee);
+    }
+
+    void UpdateEmployee(EmployeeModel employee)
+    {
+        var result = _db.UpdateEmployee(employee);
+        employee.isEditing = false;
+
+    }
+
+    void InsertEmployee(EmployeeModel employee)
+    {
+        var result = _db.InsertEmployee(employee);
+        ClearInputs();
+        StateHasChanged();
+    }
+
+    void ClearInputs()
+    {
+        insertEmployee = new EmployeeModel();
+    }
+
+    void FlipEdit()
+    {
+        isEdit = !isEdit;
     }
 }
